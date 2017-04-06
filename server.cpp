@@ -4,8 +4,11 @@
 #include<iterator>
 #include<iostream>
 #include<utility>
+#include<fstream>
+#include<unistd.h>
 #include<boost/asio.hpp>
 #include<thread>
+#include <signal.h>
 #define port 1234
 
 using boost::asio::ip::tcp;
@@ -107,20 +110,58 @@ void runServer() {
     serv->request();
 }
 
+void killServer() {
+    std::ifstream fileWithPid("chatServer.pid");
+    pid_t pid = 0;
+    fileWithPid >> pid;
+    std::cout << "-s " << pid  << std::endl;
+    fileWithPid.close();
+    remove("chatServer.pid");
+    kill(pid, SIGUSR1);
+}
+
+void writePidIntoFile(pid_t pid) {
+    
+    std::ofstream fileDaemonPid("chatServer.pid");
+    std::cout << pid << std::endl;
+    fileDaemonPid << pid;
+    fileDaemonPid.close();
+}
+
 int main(int argc, char **argv) 
 {
     bool isDaemon = false;
-    if(findOptions(argv, argv+argc, "-d")) {
+    if(findOptions(argv, argv+argc, "-d")) { //daemon
 	isDaemon = true;
     }
+    else if(findOptions(argv, argv+argc, "-s")) { //stop
+	//stop server
+	killServer();
+	return 0;
+    }
+    else if(findOptions(argv, argv+argc, "-info")) {
+	//print all options
+    }
+    
     int pid = fork();
+
     if(pid < 0) exit(0);
     if(pid == 0 && isDaemon) {
-	daemon(0, 0);
+	umask(0);
+	
+	pid_t p = setsid();
+	writePidIntoFile(p);
+	
+	chdir("/");
+	close(STDIN_FILENO);
+        close(STDOUT_FILENO);
+        close(STDERR_FILENO);
+
 	runServer();
     }
     else if(pid > 0 && !isDaemon) {
     	runServer();
     }
+    remove("chatServer.pid");
     return 0;
 }
