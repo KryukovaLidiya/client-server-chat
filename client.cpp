@@ -7,6 +7,7 @@
 #define port 1234
 
 using boost::asio::ip::tcp;
+bool isStop = false;
 
 void send_pth(tcp::socket *sock) {
 	char buf[512]; 
@@ -16,6 +17,7 @@ void send_pth(tcp::socket *sock) {
     	    std::cin.getline(buf, 512);
     	    boost::asio::write(*sock, boost::asio::buffer(buf, 512));
 	}
+	isStop = true;
 }
 
 int main () 
@@ -29,11 +31,14 @@ int main ()
 
     std::cout << "You into chat, you can use options: " << std::endl;
     std::cout << "\t-stop - this is option for go out " << std::endl;
-    std::cout << "\t-cout - this is option for count of users now " << std::endl; 
+    std::cout << "\t-count - this is option for count of users now " << std::endl; 
 
     std::thread thr(send_pth, &sock);
     while(1) {
     	boost::asio::read(sock, boost::asio::buffer(buf, 512));
+	if(isStop) {
+	   break;
+	}
 	std::cout << buf << std::endl;
     }
     thr.join();
