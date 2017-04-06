@@ -139,8 +139,11 @@ int main(int argc, char **argv)
 	killServer();
 	return 0;
     }
-    else if(findOptions(argv, argv+argc, "-info")) {
-	//print all options
+    else if(argc > 1) {
+	std::cout << "You can use:" << std::endl;	
+	std::cout << "\t-s - stop deamon process" << std::endl;
+	std::cout << "\t-d - start deamon process" << std::endl;
+    	return 0;
     }
     
     int pid = fork();
