@@ -1,15 +1,19 @@
-CC=g++
-CFLAGS=-Wall -lpthread -lboost_system -std=c++11
-LDFLAGS=
+SVR_OBJECT_FILES = server.o
+CLT_OBJECT_FILES = client.o
 
-all: server client
+CFLAGS=-Wall -std=c++11
+LIBS = -lpthread -lboost_system 
+CC = g++
 
-server: server.o
-	$(CC) $(CFLEGS) -o $@ $<
+all: client server
+client: $(CLT_OBJECT_FILES) 
+server: $(SVR_OBJECT_FILES)  
 
-client: client.o
-	$(CC) $(CFLAGS) -o $@ $<
+client server:
+	$(CC) $^ $(CFLAGS) $(LIBS) -o $@  
 
 .cpp.o:
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $(LIBS) -c $< 
 
+clean: 
+	rm -rf client server *.o

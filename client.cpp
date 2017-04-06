@@ -20,14 +20,19 @@ void send_pth(tcp::socket *sock) {
 	isStop = true;
 }
 
-int main () 
+int main (int argc, char **argv) 
 {
     boost::asio::io_service io_service;
     char buf[512];
+
+    if(argc < 3) {
+	std::cout << "./client 127.0.0.1 port" << std::endl;
+	return 0;
+    }
     
     tcp::socket sock(io_service);
     tcp::resolver resolver(io_service);
-    boost::asio::connect(sock, resolver.resolve({"127.0.0.1", "1234"}));
+    boost::asio::connect(sock, resolver.resolve({argv[1], argv[2]}));
 
     std::cout << "You into chat, you can use options: " << std::endl;
     std::cout << "\t-stop - this is option for go out " << std::endl;
@@ -39,7 +44,7 @@ int main ()
 	if(isStop) {
 	   break;
 	}
-	std::cout << buf << std::endl;
+	std::cout << "receive: " <<  buf << std::endl;
     }
     thr.join();
     return 0;

@@ -10,7 +10,6 @@
 #include<thread>
 #include<string>
 #include <signal.h>
-#define port 1234
 
 using boost::asio::ip::tcp;
 std::vector<tcp::socket> fd;
@@ -91,14 +90,14 @@ class Server {
     tcp::acceptor acc;
 
     static Server *p_instance;
-    Server(key_t key) : acc(io_service, tcp::endpoint(tcp::v4(),port)) {
+    Server(key_t key, int port) : acc(io_service, tcp::endpoint(tcp::v4(), port)) {
     	assert((msggit = msgget(key, IPC_CREAT | 0666)) >= 0);
 	acc.listen(10);
     }
 public:
-    static Server *getInstance(key_t key = 10) {
+    static Server *getInstance(int port, key_t key = 10) {
         if(!p_instance)           
-            p_instance = new Server(key);
+            p_instance = new Server(key, port);
         return p_instance;
     }
 
@@ -131,8 +130,8 @@ bool findOptions(char** begin, char** end, const std::string& option)
     return std::find(begin, end, option) != end;
 }
 
-void runServer() {
-    const std::unique_ptr<Server> serv(Server::getInstance());
+void runServer(int port) {
+    const std::unique_ptr<Server> serv(Server::getInstance(port));
     serv->request();
 }
 
@@ -160,10 +159,10 @@ void writePidIntoFile(pid_t pid) {
 
 bool cheackOptions(int &argc, char **argv) {
     bool isDaemon = false;
-    if(findOptions(argv, argv+argc, "-d")) { //daemon
+    if(findOptions(argv + 2, argv+argc, "-d")) { //daemon
 	isDaemon = true;
     }
-    else if(findOptions(argv, argv+argc, "-s")) { //stop
+    else if(findOptions(argv + 2, argv+argc, "-s")) { //stop
 	//stop server
 	killServer();
 	exit(0);
@@ -177,9 +176,28 @@ bool cheackOptions(int &argc, char **argv) {
     return isDaemon;
 }
 
+bool isDigit(char *port) {
+    bool isd = true;
+    while(*port) {
+    	if(!isdigit(*port++)) {
+            isd = false;
+            break;
+        }
+    }
+    return isd;
+}
+
 int main(int argc, char **argv) 
 {
-    bool isDaemon = cheackOptions(argc, argv);
+    bool isDaemon = false;
+    if(argc < 2 || !isDigit(argv[1])) { //daemon
+	std::cout << "./server port ...." << std::endl;
+	std::cout << ".... - this is options or without" << std::endl;
+    	return 0;
+    } 
+    else if (argc > 2) {
+    	isDaemon = cheackOptions(argc, argv);    
+    }
 
     int pid = fork();
 
@@ -195,10 +213,10 @@ int main(int argc, char **argv)
         close(STDOUT_FILENO);
         close(STDERR_FILENO);
 
-	runServer();
+	runServer(atoi(argv[1]));
     }
     else if(pid > 0 && !isDaemon) {
-    	runServer();
+    	runServer(atoi(argv[1]));
     }
     remove("chatServer.pid");
     return 0;
