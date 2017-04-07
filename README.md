@@ -1,20 +1,15 @@
-# client-server-chat
+#client-server-chat
 libs: boost, boost asio, std::thread
-CC: g++ std=c++11
-system: linux
+CC: g++ -std=c++11
 
-#make
+# Make
 make all
 
-#server
-./server port -d (This is deamon process of server)
-./server port -s (kill this deamon process)
-./server port otherOptions (View all right options)
-./server port (This is server without options)
-others variant is not right
+# Server
+./server port [-h]
+* Daemonized mode
+./server port -d (start daemon)
+./server port -s (kill daemon)
 
-#client
+# Client
 ./client 127.0.0.1 port
-other variant is not right
-
-
