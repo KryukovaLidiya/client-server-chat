@@ -1,5 +1,6 @@
 #include "service.h"
 
+/* Class for messaging */
 class ThreadsMessanger {
 public:
     long type;
@@ -11,6 +12,7 @@ public:
     }
 };
 
+/* thread for write message to socket */
 void threadSend(int msggit) {
     while(1) {
         ThreadsMessanger sbuf;
@@ -22,6 +24,7 @@ void threadSend(int msggit) {
     }
 }
 
+/*Thread for read message from socket */
 void threadGive(int msggit, int index)
 {
     char buf[512];

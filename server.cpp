@@ -1,10 +1,16 @@
 #include"server.h"
 
+/*function for start server configuration */
 void runServer(int port) {
     const std::unique_ptr<Server> serv(Server::getInstance(port));
     serv->request();
 }
 
+/*  
+ *  first: cheack daemon process or not 
+ *  second: start server 
+ *  the end: delete service file
+ */
 int main(int argc, char **argv) 
 {
     bool isDaemon = false;

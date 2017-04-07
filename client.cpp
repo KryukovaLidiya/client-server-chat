@@ -1,14 +1,19 @@
+/*
+client.cpp - client for chat
+*/
 #include<assert.h>
 #include<thread>
 #include<iostream>
 #include<string.h>
 #include <utility>
 #include<boost/asio.hpp>
-#define port 1234
 
 using boost::asio::ip::tcp;
 bool isStop = false;
 
+/*
+thread for send your message
+*/
 void send_pth(tcp::socket *sock) {
 	char buf[512]; 
    	while(strcmp(buf, "-stop") != 0) {		
@@ -39,6 +44,10 @@ int main (int argc, char **argv)
     std::cout << "\t-count - this is option for count of users now " << std::endl; 
 
     std::thread thr(send_pth, &sock);
+
+    /*
+     * Thread for read message
+     */
     while(1) {
     	boost::asio::read(sock, boost::asio::buffer(buf, 512));
 	if(isStop) {
