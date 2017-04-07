@@ -1,4 +1,4 @@
-SVR_OBJECT_FILES = server.o
+SVR_OBJECT_FILES = server.o sendAndRecv.o optionsAndFile.o
 CLT_OBJECT_FILES = client.o
 
 CFLAGS=-Wall -std=c++11
@@ -10,7 +10,7 @@ client: $(CLT_OBJECT_FILES)
 server: $(SVR_OBJECT_FILES)  
 
 client server:
-	$(CC) $^ $(CFLAGS) $(LIBS) -o $@  
+	$(CC) $^ $(CFLAGS) $(LIBS) -o $@
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(LIBS) -c $< 
