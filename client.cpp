@@ -11,6 +11,11 @@ client.cpp - client for chat
 using boost::asio::ip::tcp;
 bool isStop = false;
 
+
+void stopClient(tcp::socket *sock) {
+    while(!isStop);
+    boost::asio::write(*sock, boost::asio::buffer("-stop", 512));
+}
 /*
 thread for send your message
 */
@@ -38,11 +43,20 @@ int main (int argc, char **argv)
     tcp::socket sock(io_service);
     tcp::resolver resolver(io_service);
     boost::asio::connect(sock, resolver.resolve({argv[1], argv[2]}));
+			    
+    auto handl = 
+      [] (int i) { 
+		   isStop = true;
+   		   sleep(2);
+    		   exit(EXIT_SUCCESS);
+		};
 
+    signal (SIGINT, handl); 
     std::cout << "You into chat, you can use options: " << std::endl;
     std::cout << "\t-stop - this is option for go out " << std::endl;
     std::cout << "\t-count - this is option for count of users now " << std::endl; 
 
+    std::thread thr2(stopClient, &sock);
     std::thread thr(send_pth, &sock);
 
     /*

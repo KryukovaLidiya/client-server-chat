@@ -1,4 +1,5 @@
-#pragma ones
+#ifndef SERVER_H
+#define SERVER_H
 
 #include<assert.h>
 #include<sys/msg.h>
@@ -60,7 +61,9 @@ public:
     }
     ~Server() {
         for(auto &socket : fd) {
-           socket.close();
+	    if(socket.is_open()) {
+               socket.close();
+            }
         }
         msgctl(msggit, IPC_RMID, 0);//Удаление очереди
         delete p_instance;
@@ -68,3 +71,5 @@ public:
 };
 
 Server* Server::p_instance = 0;
+
+#endif

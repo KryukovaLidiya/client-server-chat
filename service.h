@@ -27,5 +27,4 @@ void writePidIntoFile(pid_t pid);
 bool cheackOptions(int &argc, char **argv);
 bool isDigit(char *port);
 
-
 #endif

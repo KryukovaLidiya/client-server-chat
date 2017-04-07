@@ -1,4 +1,5 @@
 #include "service.h"
+static int countOfUser = 0;
 
 /* Class for messaging */
 class ThreadsMessanger {
@@ -18,7 +19,9 @@ void threadSend(int msggit) {
         ThreadsMessanger sbuf;
         if((msgrcv(msggit, &sbuf, sizeof(sbuf), 1, 0)) >= 0) {
             for(auto &socket: fd) {
-                boost::asio::write(socket, boost::asio::buffer(sbuf.buf, 512));
+		if(socket.is_open()) {
+                	boost::asio::write(socket, boost::asio::buffer(sbuf.buf, 512));
+		}
             }
         }
     }
@@ -27,13 +30,13 @@ void threadSend(int msggit) {
 /*Thread for read message from socket */
 void threadGive(int msggit, int index)
 {
+    countOfUser++;
     char buf[512];
     bool isExit = false;
     memset(buf, 0, 512);
 
     strcpy(buf, "count of client ");
-    int count = fd.size();
-    sprintf(buf, "%s%d", buf, count);
+    sprintf(buf, "%s%d", buf, countOfUser);
     ThreadsMessanger sbuf = ThreadsMessanger(buf);
     msgsnd(msggit, &sbuf, sizeof(sbuf), IPC_NOWAIT);
 
@@ -53,19 +56,19 @@ void threadGive(int msggit, int index)
         }
 
         if(strcmp(buf, "-stop") == 0) {
+	    isExit = true;
             strcpy(buf, "one of client go out: bye");
         }
         else if(strcmp(buf, "-count") == 0) {
             strcpy(buf, "count of client ");
-            int count = fd.size();
-            sprintf(buf, "%s%d", buf, count);
+            sprintf(buf, "%s%d", buf, countOfUser);
         }
         ThreadsMessanger sbuf = ThreadsMessanger(buf);
         msgsnd(msggit, &sbuf, sizeof(sbuf), IPC_NOWAIT);
 
         if(isExit) {
-           std::swap(fd[index], fd[fd.size() - 1]);
-           fd.erase(fd.begin() + fd.size() - 1);
+           fd[index].close();
+	   countOfUser--;
            break;
         }
     }
