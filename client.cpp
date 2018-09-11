@@ -11,11 +11,11 @@ client.cpp - client for chat
 using boost::asio::ip::tcp;
 bool isStop = false;
 
-
-void stopClient(tcp::socket *sock) {
+void stop_client(tcp::socket *sock) {
     while(!isStop);
     boost::asio::write(*sock, boost::asio::buffer("-stop", 512));
 }
+
 /*
 thread for send your message
 */
@@ -30,8 +30,7 @@ void send_pth(tcp::socket *sock) {
 	isStop = true;
 }
 
-int main (int argc, char **argv) 
-{
+int main (int argc, char **argv) {
     boost::asio::io_service io_service;
     char buf[512];
 
@@ -56,7 +55,7 @@ int main (int argc, char **argv)
     std::cout << "\t-stop - this is option for go out " << std::endl;
     std::cout << "\t-count - this is option for count of users now " << std::endl; 
 
-    std::thread thr2(stopClient, &sock);
+    std::thread thr2(stop_client, &sock);
     std::thread thr(send_pth, &sock);
 
     /*
