@@ -30,8 +30,7 @@ void thread_send(int msggit) {
 }
 
 /*Thread for read message from socket */
-void threadGive(int msggit, int index)
-{
+void threadGive(int msggit, int index) {
     count_of_user++;
     char buf[512];
     bool isExit = false;
