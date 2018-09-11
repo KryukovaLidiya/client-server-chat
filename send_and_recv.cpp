@@ -1,12 +1,14 @@
 #include "service.h"
-static int countOfUser = 0;
+
+static int count_of_user = 0;
 
 /* Class for messaging */
-class ThreadsMessanger {
+class Threads_messanger {
 public:
     long type;
     char buf[512];
-    ThreadsMessanger(char *buf = nullptr, long type = 1) : type(type) {
+    
+    Threads_messanger(char *buf = nullptr, long type = 1) : type(type) {
         if(buf != nullptr) {
             strcpy(this->buf, buf);
         }
@@ -14,9 +16,9 @@ public:
 };
 
 /* thread for write message to socket */
-void threadSend(int msggit) {
+void thread_send(int msggit) {
     while(1) {
-        ThreadsMessanger sbuf;
+        Threads_messanger sbuf;
         if((msgrcv(msggit, &sbuf, sizeof(sbuf), 1, 0)) >= 0) {
             for(auto &socket: fd) {
 		if(socket.is_open()) {
@@ -30,14 +32,14 @@ void threadSend(int msggit) {
 /*Thread for read message from socket */
 void threadGive(int msggit, int index)
 {
-    countOfUser++;
+    count_of_user++;
     char buf[512];
     bool isExit = false;
     memset(buf, 0, 512);
 
     strcpy(buf, "count of client ");
-    sprintf(buf, "%s%d", buf, countOfUser);
-    ThreadsMessanger sbuf = ThreadsMessanger(buf);
+    sprintf(buf, "%s%d", buf, count_of_user);
+    Threads_messanger sbuf = Threads_messanger(buf);
     msgsnd(msggit, &sbuf, sizeof(sbuf), IPC_NOWAIT);
 
     while(1) {
@@ -61,14 +63,15 @@ void threadGive(int msggit, int index)
         }
         else if(strcmp(buf, "-count") == 0) {
             strcpy(buf, "count of client ");
-            sprintf(buf, "%s%d", buf, countOfUser);
+            sprintf(buf, "%s%d", buf, count_of_user);
         }
-        ThreadsMessanger sbuf = ThreadsMessanger(buf);
+	
+        Threads_messanger sbuf = Threads_messanger(buf);
         msgsnd(msggit, &sbuf, sizeof(sbuf), IPC_NOWAIT);
 
         if(isExit) {
            fd[index].close();
-	   countOfUser--;
+	   count_of_user--;
            break;
         }
     }
