@@ -17,14 +17,14 @@
 using boost::asio::ip::tcp;
 extern std::vector<tcp::socket> fd;
 
-class ThreadsMessanger;
-void threadSend(int msggit);
-void threadGive(int msggit, int index);
-bool findOptions(char** begin, char** end, const std::string& option);
-pid_t readFromFile(std::ifstream &file);
-void killServer();
-void writePidIntoFile(pid_t pid);
-bool cheackOptions(int &argc, char **argv);
-bool isDigit(char *port);
+class Threads_messanger;
+void kill_server();
+void thread_send(int msggit);
+void thread_give(int msggit, int index);
+void write_pid_into_file(pid_t pid);
+bool cheack_options(int &argc, char **argv);
+bool is_digit(char *port);
+bool find_options(char** begin, char** end, const std::string& option);
+pid_t read_from_file(std::ifstream &file);
 
 #endif
