@@ -13,20 +13,21 @@
 #include<thread>
 #include<string>
 #include<signal.h>
+
 #include "service.h"
 
 using boost::asio::ip::tcp;
 std::vector<tcp::socket> fd;
 
-class ThreadsMessanger;
-void threadSend(int msggit);
-void threadGive(int msggit, int index);
-bool findOptions(char** begin, char** end, const std::string& option);
-pid_t readFromFile(std::ifstream &file);
-void killServer();
-void writePidIntoFile(pid_t pid);
-bool cheackOptions(int &argc, char **argv);
-bool isDigit(char *port);
+class Threads_messanger;
+void thread_send(int msggit);
+void thread_give(int msggit, int index);
+bool find_options(char** begin, char** end, const std::string& option);
+pid_t read_from_file(std::ifstream &file);
+void kill_server();
+void write_pid_into_file(pid_t pid);
+bool cheack_options(int &argc, char **argv);
+bool is_digit(char *port);
 
 class Server {
     int msggit;
@@ -40,25 +41,26 @@ class Server {
         acc.listen(10);
     }
 public:
-    static Server *getInstance(int port, key_t key = 10) {
+    static Server *get_instance(int port, key_t key = 10) {
         if(!p_instance)
             p_instance = new Server(key, port);
         return p_instance;
     }
 
     void request() {
-        std::thread thrS(threadSend, msggit);
+        std::thread thr_s(threadSend, msggit);
         int i = 0;
         while (1)
         {
             tcp::socket newsock(io_service);
             acc.accept(newsock);
-            std::thread(threadGive, msggit, i).detach();
+            std::thread(thread_give, msggit, i).detach();
             fd.emplace_back(std::move(newsock));
             i++;
         }
-        thrS.join();
+        thr_s.join();
     }
+	
     ~Server() {
         for(auto &socket : fd) {
 	    if(socket.is_open()) {
