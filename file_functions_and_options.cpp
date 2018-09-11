@@ -3,20 +3,19 @@
 /*
 find options into two-dimensional array
 */
-bool findOptions(char** begin, char** end, const std::string& option)
-{
+bool find_options(char** begin, char** end, const std::string& option) {
     return std::find(begin, end, option) != end;
 }
 
 /* read pid into file */
-pid_t readFromFile(std::ifstream &file) {
+pid_t read_from_file(std::ifstream &file) {
     pid_t pid;
     file >> pid;
     return pid;
 }
 
 /*kill server process */
-void killServer() {
+void kill_server() {
     std::ifstream file("chatServer.pid");
     pid_t pid = readFromFile(file);
     file.close();
@@ -25,14 +24,14 @@ void killServer() {
 }
 
 /* write pid into file*/
-void writePidIntoFile(pid_t pid) {
+void write_pid_into_file(pid_t pid) {
     std::ofstream file("chatServer.pid");
     file << pid;
     file.close();
 }
 
 /* check options */
-bool cheackOptions(int &argc, char **argv) {
+bool cheack_options(int &argc, char **argv) {
     bool isDaemon = false;
     if(findOptions(argv + 2, argv+argc, "-d")) { //daemon
         isDaemon = true;
@@ -51,7 +50,7 @@ bool cheackOptions(int &argc, char **argv) {
 }
 
 /* check port */
-bool isDigit(char *port) {
+bool is_digit(char *port) {
     bool isd = true;
     while(*port) {
         if(!isdigit(*port++)) {
